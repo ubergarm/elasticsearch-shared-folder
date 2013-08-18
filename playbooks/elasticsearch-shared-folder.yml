@@ -1,0 +1,63 @@
+---
+#this ansible playbook will provision a gitlab and jenkins ci server
+- name: Install and configure elasticsearch to search shared folders.
+  hosts: servers
+  user: vagrant
+  sudo: yes
+  tasks:
+
+  - include: java7.yml
+
+  - name: ensure required apt packages are installed
+    apt: name=$item state=latest
+    with_items:
+    - build-essential
+    - python-software-properties                                                               
+    - python-dev
+    - curl
+    - python-pip
+    - supervisor
+    - git
+
+  - name: ensure required pip packages are installed
+    pip: name=$item
+    with_items:
+    - cython
+    - git+git://github.com/kivy/pyjnius.git
+    
+  - name: download elasticsearch
+    get_url: url=https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-0.90.3.tar.gz dest=/tmp/
+
+  - name: decompress elasticsearch into /home/vagrant/
+    command: tar -xvf /tmp/elasticsearch-0.90.3.tar.gz 
+  
+  - name: download apache tika 1.4
+    get_url: url=http://mirror.sdunix.com/apache/tika/tika-app-1.4.jar dest=/home/vagrant/
+
+  # - name: download kibana
+  #   get_url: url=https://github.com/elasticsearch/kibana/archive/master.tar.gz dest=/tmp/
+
+  # - name: decompress kibana
+  #   command: tar -xvf /tmp/master.tar.gz 
+
+  # TODO should probably use some sort of template for this instead of lineinefile
+  - name: update supervisord.conf file to watch our app
+    lineinfile: dest=/etc/supervisor/supervisord.conf regexp='^\[program:elasticsearch\]' line='[program:elasticsearch]' state=present
+
+  - name: update supervisord.conf file to watch our app
+    lineinfile: dest=/etc/supervisor/supervisord.conf regexp='^command=\/home\/vagrant\/elasticsearch-0.90.3\/bin\/elasticsearch -f' line='command=/home/vagrant/elasticsearch-0.90.3/bin/elasticsearch -f' state=present
+
+  - name: make sure supervisor is running and picks up latest .conf
+    service: name=supervisor state=restarted
+ 
+  # TODO just in case there is trouble with supervisord stuff
+  # - name: keep elasticsearch up and running
+  #   action: supervisorctl name=elasticsearch state=started
+
+  # - name: run elasticsearch on port 9200
+  #   command: /home/vagrant/elasticsearch-0.90.3/bin/elasticsearch -f
+
+  - name: Done, Give it a try!
+    action: debug msg="Point your browser to http://localhost:9200/"
+  # action: debug msg="Point your browser to http://localhost:8080/"
+        
