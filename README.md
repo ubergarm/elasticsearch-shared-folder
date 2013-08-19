@@ -1,10 +1,9 @@
 elasticsearch-shared-folder
 ===============
 
-This demo isnt done, probably never will be, just holds some ideas and scripts.
-
 A vagrant virtualbox based elasticsearch server that indexes a directory of files with tika.
-As my files are stored on a CIFS share, I didn't want to go the attachment plugin route.
+
+I didn't want to go the attachment plugin route as my files are stored on a CIFS share.
 
 
 Try it out!
@@ -38,17 +37,17 @@ _To manually clean up stray VMs_
 
 
 ####TODO:
-* Base vargrant virtualbox install
-* Install java7
-* Install elasticsearch
-* Install tika
-* Install python/jnius
-* Startup elasticsearch server
-* Recursivly index all files in `./files_to_index`
+* ~~Base vargrant virtualbox install~~
+* ~~Install java7~~
+* ~~Install elasticsearch~~
+* ~~Install tika~~
+* ~~Install python/jnius~~
+* ~~Startup elasticsearch server~~
+* ~~Recursivly index all files in `./files_to_index`~~
 * Provide a web based search bar
 
 ####Issues:
-* Find Time to work on this!
+* Find how to extend a standard earth day to 26+ hours long.
 
 ####Notes:
 * bootstrap.sh does a one-time install of ansible to get the ball rolling

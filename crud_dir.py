@@ -5,8 +5,11 @@ from os import listdir
 from os.path import isfile, join
 import sys
 
+from pyes import *
+
 os.environ['CLASSPATH'] = '/home/vagrant/tika-app-1.4.jar'
 from jnius import autoclass
+
 
 def main():
     if len(sys.argv) < 2:
@@ -21,15 +24,71 @@ def main():
     Metadata = autoclass('org.apache.tika.metadata.Metadata')
     FileInputStream = autoclass('java.io.FileInputStream')
 
-    tika = Tika()
-    meta = Metadata()
+    ## connecto to local elasticsearch server with pyes
+    conn = ES('127.0.0.1:9200')
+    ## delete the old index
+    try:
+        conn.indices.delete_index('files-index')
+    except:
+        pass
+    ## create a new index
+    conn.indices.create_index('files-index')
+    ## set up index mapping via dict
+    mapping = {
+            'filename': {
+                'boost': 1.0,
+                'index': 'not_analyzed',
+                'store': 'yes',
+                'type': 'string'
+                },
+            'parsedtext': {
+                'boost': 1.0,
+                'index': 'analyzed',
+                'store': 'yes',
+                'type': 'string',
+                'term_vector' : 'with_positions_offsets'
+                }
+            }
+    conn.indices.put_mapping('files-type', {'properties':mapping}, ['files-index'])
 
-    ## use tika to extract text and metadata from all files in specified dir
+    ## use tika to extract text and metadata from all files in specified dir and index results in elasticsearch
+    numFiles = len(files)
+    curFile = 0
     for filename in files:
-        text = tika.parseToString(FileInputStream(filename), meta)
-        print text
-        for name in meta.names():
-            print '{{ {0}: {1} }}'.format(name, meta.get(name))
+        curFile += 1
+        print '------ PARSING {0} of {1}: {2} ------'.format(curFile, numFiles, filename)
+
+
+        tika = Tika()
+        meta = Metadata()
+
+        try:
+            text = tika.parseToString(FileInputStream(filename), meta)
+        except Exception as E:
+            # print E
+            # print 'Error processing {0}'.format(filename)
+            continue
+
+        # for name in meta.names():
+        #     print '{{ {0}: {1} }}'.format(name, meta.get(name))
+        # print text
+        # fields to throw into elasticsearch:
+        # title:
+        # Author:
+        # creator:
+        # date:
+        # plaintext:
+        print '------ INDEXING: {0} ------'.format(filename)
+        print ''
+        conn.index({'filename':'{0}'.format(filename), 'parsedtext':'{0}'.format(text)}, 'files-index', 'files-type', curFile)
+
+    ## refresh index
+    conn.indices.refresh('files-index')
+
+    ## DONE
+    print 'ALL DONE!'
+    print 'To see what you indexed, point your browser at:'
+    print '\thttp://localhost:9200/files-index/_search?q=blah'
 
 if __name__ == '__main__':
     main()
