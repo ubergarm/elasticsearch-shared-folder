@@ -3,19 +3,29 @@ elasticsearch-shared-folder
 
 A vagrant virtualbox based elasticsearch server that indexes a directory of files with tika.
 
-I didn't want to go the attachment plugin route as my files are stored on a CIFS share.
+I didn't want to go the attachment plugin route as my files are stored on a CIFS share or USB drive.
 
 
 Try it out!
 -----------
 *Bring up the virtualmachine and provision the server*
 
-    $ vagrant up
+    $ vagrant up `can take a while depending on your network speed`
+    $ vagrant ssh
+    $ sudo -i
+    $ cd /vagrant/
+    _you could symlink a dir to index any directory_ 
+    _WARNING: crud_dir.py deletes entire index before re-building it!!!__ 
+    $ crud_dir.py ./files_to_index/
 
 _Point your browser at_
 
-    webserver: http://localhost:8080/
-    elasticsearch: http://localhost:9020
+    _simple flask based search full text:_
+    http://localhost:8080/search_text/<keyword>
+    _simple flask based search wildcard filenames:_
+    http://localhost:8080/search_name/*.mp3
+    _elasticengine under the hood:_
+    http://localhost:9020
 
 _Cleaning up_
 
@@ -34,7 +44,8 @@ _To manually clean up stray VMs_
 * [ansible](https://github.com/ansible/ansible/) -- provisioner loaded up first
 * [elasticsearch](http://www.elasticsearch.org/) -- flexible and powerfule opensource distributed real-time search and analytics engine
 * [tika] (http://tika.apache.org/) -- Extracts metadata from rich documents (e.g. PDF / Word)
-
+* flask
+* pyes
 
 ####TODO:
 * ~~Base vargrant virtualbox install~~
@@ -44,9 +55,13 @@ _To manually clean up stray VMs_
 * ~~Install python/jnius~~
 * ~~Startup elasticsearch server~~
 * ~~Recursivly index all files in `./files_to_index`~~
-* Provide a web based search bar
+* ~~Provide a basic web based search~~
+* Make the web page pretty with a real search bar
+* Make parsing faster
 
 ####Issues:
+* Current flask templates are butt ugly.
+* Links don't redirect to full path correctly on host OS.
 * Find how to extend a standard earth day to 26+ hours long.
 
 ####Notes:
@@ -66,6 +81,7 @@ _To manually clean up stray VMs_
 * [owainlewis](https://gist.github.com/owainlewis/6069582) -- Java 7 ansible playbook gist
 * [karmi](https://gist.github.com/karmi/5594127) -- test attachments elasticsearch
 * [hackzine](http://www.hackzine.org/using-apache-tika-from-python-with-jnius.html) -- python interface to tika with jnius
+* [Clinton Gormley](http://www.youtube.com/watch?v=52G5ZzE0XpY) -- getting down and dirty with elasticsearch
 
 Contributing
 ------------

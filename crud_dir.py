@@ -39,7 +39,7 @@ def main():
                 'boost': 1.0,
                 'index': 'not_analyzed',
                 'store': 'yes',
-                'type': 'string'
+                'type': 'string',
                 },
             'parsedtext': {
                 'boost': 1.0,
@@ -58,7 +58,6 @@ def main():
         curFile += 1
         print '------ PARSING {0} of {1}: {2} ------'.format(curFile, numFiles, filename)
 
-
         tika = Tika()
         meta = Metadata()
 
@@ -72,23 +71,22 @@ def main():
         # for name in meta.names():
         #     print '{{ {0}: {1} }}'.format(name, meta.get(name))
         # print text
-        # fields to throw into elasticsearch:
-        # title:
-        # Author:
-        # creator:
-        # date:
-        # plaintext:
+        # possible future fields to throw into elasticsearch:
+        # title, Author, creator, date, plaintext, size
+
         print '------ INDEXING: {0} ------'.format(filename)
         print ''
         conn.index({'filename':'{0}'.format(filename), 'parsedtext':'{0}'.format(text)}, 'files-index', 'files-type', curFile)
 
-    ## refresh index
-    conn.indices.refresh('files-index')
+        ## refresh index after each file is parsed so you don't have to wait
+        conn.indices.refresh('files-index')
 
     ## DONE
     print 'ALL DONE!'
     print 'To see what you indexed, point your browser at:'
     print '\thttp://localhost:9200/files-index/_search?q=blah'
+    print 'To use flask search bar, point your browser at:'
+    print '\thttp://localhost:8080/search_text/blah'
 
 if __name__ == '__main__':
     main()

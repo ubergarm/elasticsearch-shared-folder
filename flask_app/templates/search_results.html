@@ -1,0 +1,14 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+<h3>Search results for "{{query}}":</h3>
+<ul>
+{% for result in results %}
+    <li><a href='file://{{result.filename}}'>{{result.filename}}</a>
+    <ul>
+    <li>{{result.parsedtext[:80]}}
+    </ul>
+{% endfor %}
+</ul>
+{% endblock %}

@@ -18,6 +18,7 @@
     - python-pip
     - supervisor
     - git
+    - python-flask
 
   - name: ensure required pip packages are installed
     pip: name=$item
@@ -41,12 +42,15 @@
   # - name: decompress kibana
   #   command: tar -xvf /tmp/master.tar.gz 
 
-  # TODO should probably use some sort of template for this instead of lineinefile
-  - name: update supervisord.conf file to watch our app
+  # TODO should probably use some sort of template to replace lineinefile
+  - name: update supervisord.conf file to watch elasticsearch
     lineinfile: dest=/etc/supervisor/supervisord.conf regexp='^\[program:elasticsearch\]' line='[program:elasticsearch]' state=present
-
-  - name: update supervisord.conf file to watch our app
+  - name: update supervisord.conf file to watch elasticsearch
     lineinfile: dest=/etc/supervisor/supervisord.conf regexp='^command=\/home\/vagrant\/elasticsearch-0.90.3\/bin\/elasticsearch -f' line='command=/home/vagrant/elasticsearch-0.90.3/bin/elasticsearch -f' state=present
+  - name: update supervisord.conf file to watch our flask app
+    lineinfile: dest=/etc/supervisor/supervisord.conf regexp='^\[program:flask_app\]' line='[program:flask_app]' state=present
+  - name: update supervisord.conf file to watch our flask app
+    lineinfile: dest=/etc/supervisor/supervisord.conf regexp='^command=\/vagrant\/flask_app\/app.py' line='command=/vagrant/flask_app/app.py' state=present
 
   - name: make sure supervisor is running and picks up latest .conf
     service: name=supervisor state=restarted
