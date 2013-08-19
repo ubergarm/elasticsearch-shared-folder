@@ -14,8 +14,8 @@ Try it out!
     $ vagrant ssh
     $ sudo -i
     $ cd /vagrant/
-    _you could symlink a dir to index any directory_ 
-    _WARNING: crud_dir.py deletes entire index before re-building it!!!__ 
+    `you could mount a dir into main folder to index it at /vagrant/mnt` 
+    `WARNING: crud_dir.py deletes entire index before re-building it!!!`
     $ crud_dir.py ./files_to_index/
 
 _Point your browser at_
@@ -62,6 +62,7 @@ _To manually clean up stray VMs_
 ####Issues:
 * Current flask templates are butt ugly.
 * Links don't redirect to full path correctly on host OS.
+* dog slow...:)
 * Find how to extend a standard earth day to 26+ hours long.
 
 ####Notes:

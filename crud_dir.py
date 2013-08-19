@@ -16,7 +16,11 @@ def main():
         print "Usage: %s <directory to index into elasticsearch at localhost:9200>" % sys.argv[0]
         sys.exit(0)
     dname = sys.argv[1]
-    files = [join(dname, f) for f in listdir(dname) if isfile(join(dname, f))]
+    files = []
+    for root, subFolders, fileList in os.walk(dname):
+        for f in fileList:
+            files.append(os.path.join(root, f))
+    # files = [join(dname, f) for f in listdir(dname) if isfile(join(dname, f))]
     # files = [f for f in files if '.rtf' in f]
 
     ## Import the Java classes we are going to need
